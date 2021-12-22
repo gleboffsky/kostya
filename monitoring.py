@@ -4,7 +4,6 @@ from PyQt5 import QtCore, QtWidgets,QtGui
 import os
 import subprocess
 
-
 class Example(QWidget):
 
     def __init__(self):
@@ -12,12 +11,12 @@ class Example(QWidget):
         self.status = True
         self.initUI()
 
-    def closeEvent(self, a0: QtGui.QCloseEvent):
+    def closeEvent(self, a0: QtGui.QCloseEvent):  # close event
         pipe_glob.kill()
         a0.accept()
 
-    def initUI(self):
-        self.qbtn = QPushButton('Start', self)
+    def initUI(self):  # creating widgets
+        self.qbtn = QPushButton('Start', self)  # button Start/Stop
         self.qbtn.resize(self.qbtn.sizeHint())
         self.qbtn.move(50, 50)
         self.qbtn.setGeometry(QtCore.QRect(325, 170, 180, 34))
@@ -28,7 +27,7 @@ class Example(QWidget):
         self.lineEdit_1 = QtWidgets.QLineEdit(self)
         self.lineEdit_1.setGeometry(QtCore.QRect(75, 70, 180, 30))
         self.lineEdit_1.setStyleSheet("background: rgb(255, 255, 255);")
-        self.lineEdit_1.setObjectName("CollectionVessel_X")
+        self.lineEdit_1.setObjectName("PORT")
         font = self.lineEdit_1.font()
         font.setPointSize(10)
         self.lineEdit_1.setFont(font)
@@ -37,7 +36,7 @@ class Example(QWidget):
         self.lineEdit_2 = QtWidgets.QLineEdit(self)
         self.lineEdit_2.setGeometry(QtCore.QRect(325, 70, 180, 30))
         self.lineEdit_2.setStyleSheet("background: rgb(255, 255, 255);")
-        self.lineEdit_2.setObjectName("CollectionVessel_X")
+        self.lineEdit_2.setObjectName("CONNECTION_SPEED")
         font = self.lineEdit_2.font()
         font.setPointSize(10)
         self.lineEdit_2.setFont(font)
@@ -46,7 +45,7 @@ class Example(QWidget):
         self.lineEdit_3 = QtWidgets.QLineEdit(self)
         self.lineEdit_3.setGeometry(QtCore.QRect(75, 170, 180, 30))
         self.lineEdit_3.setStyleSheet("background: rgb(255, 255, 255);")
-        self.lineEdit_3.setObjectName("CollectionVessel_X")
+        self.lineEdit_3.setObjectName("TIMEOUT")
         font = self.lineEdit_3.font()
         font.setPointSize(10)
         self.lineEdit_3.setFont(font)
@@ -97,11 +96,9 @@ class Example(QWidget):
         self.label_4.setText("©СПбГХВУ Лаборатория аддитивных технологий")
 
 
+    def conductor(self):    # parent readport
 
-
-    def conductor(self):
         global pipe_glob
-
         if self.qbtn.text() == "Start":
             self.qbtn.setText("Stop")
             self.qbtn.setStyleSheet("QPushButton { background-color: red }"
