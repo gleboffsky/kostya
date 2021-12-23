@@ -85,7 +85,7 @@ class Example(QWidget):
         self.Text.setGeometry(75, 250, 430, 275)
         self.qbtn.clicked.connect(self.conductor)
         self.label_4 = QtWidgets.QLabel(self)
-        self.label_4.setGeometry(QtCore.QRect(136, 540, 400, 30))
+        self.label_4.setGeometry(QtCore.QRect(120, 533, 400, 30))
         self.label_4.setObjectName("label_1")
         font = QtGui.QFont()
         font.setPointSize(11)
@@ -93,7 +93,7 @@ class Example(QWidget):
         font.setWeight(55)
         self.label_4.setFont(font)
         self.label_4.setObjectName("label_4")
-        self.label_4.setText("©СПбГХВУ Лаборатория аддитивных технологий")
+        self.label_4.setText("©СПГХВУ Лаборатория аддитивных технологий")
 
 
     def conductor(self):    # parent readport
