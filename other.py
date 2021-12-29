@@ -13,20 +13,24 @@ filepath = filedialog.asksaveasfilename(confirmoverwrite=False)
 ser = serial.Serial(port=port, baudrate=connection_speed, timeout=int(timeout))
 
 while True:
-    serialString = ser.readline()
-    data_str = serialString.decode('UTF-8')
-    now = str(datetime.now())
-    if filepath[-4] != ".":
-        if data_str != "":
-            log_file = open(filepath + ".csv", 'a')
-            log_file.write(str(now)[0:-7] + ' ' + str(data_str))
-            log_file.close()
-    else:
-        if data_str != "":
-            log_file = open(filepath, 'a')
-            log_file.write(str(now)[0:-7] + ' ' + str(data_str))
-            log_file.close()
-    tme.sleep(0.1)
-
+    try:
+        serialString = ser.readline()
+        data_str = serialString.decode('UTF-8')
+        now = str(datetime.now())
+        if filepath[-4] != ".":
+            if data_str != "":
+                log_file = open(filepath + ".csv", 'a')
+                log_file.write(str(now)[0:-7] + ' ' + str(data_str))
+                log_file.close()
+                print(filepath+ ".csv")
+        else:
+            if data_str != "":
+                log_file = open(filepath, 'a')
+                log_file.write(str(now)[0:-7] + ' ' + str(data_str))
+                log_file.close()
+                print(filepath)
+        tme.sleep(0.1)
+    except:
+        pass
 
 

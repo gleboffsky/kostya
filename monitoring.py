@@ -3,7 +3,9 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QTextBrowser
 from PyQt5 import QtCore, QtWidgets,QtGui
 import os
 import subprocess
-
+import threading
+import os.path
+import time as tme
 class Example(QWidget):
 
     def __init__(self):
@@ -93,7 +95,26 @@ class Example(QWidget):
         font.setWeight(55)
         self.label_4.setFont(font)
         self.label_4.setObjectName("label_4")
-        self.label_4.setText("©СПГХВУ Лаборатория аддитивных технологий")
+        self.label_4.setText("©СПХФУ Лаборатория аддитивных технологий")
+        self.path = ""
+
+
+    def threading_console(self):
+        t = threading.Thread(target=self.console)
+        t.daemon = True
+        t.start()
+
+
+    def console(self):
+        try:
+            read = open(self.path[0:-2].decode(),"r")
+            while True:
+                file = read.readline()
+                self.Text.insertPlainText(file)
+                tme.sleep(0.1)
+        except Exception as err:
+            print("console: ", err)
+
 
 
     def conductor(self):    # parent readport
@@ -114,8 +135,9 @@ class Example(QWidget):
             pipe.stdin.write((timeout+" ").encode("utf8"))
             pipe.stdin.write((self.qbtn.text()+" ").encode("utf8"))
             pipe.stdin.close()
+            self.path = pipe.stdout.readline()
             pipe_glob = pipe
-
+            self.threading_console()
 
 
         elif self.qbtn.text() == "Stop":
