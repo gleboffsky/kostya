@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QTextBrowser
+from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QTextBrowser, QMessageBox
 from PyQt5 import QtCore, QtWidgets,QtGui
 import os
 import subprocess
@@ -103,6 +103,9 @@ class Example(QWidget):
         t = threading.Thread(target=self.console)
         t.daemon = True
         t.start()
+        t.join()
+        if not t.is_alive():
+            QMessageBox.critical(self, "Error ", "Неправильный порт или скорость", QMessageBox.Ok)
 
 
     def console(self):
@@ -112,8 +115,8 @@ class Example(QWidget):
                 file = read.readline()
                 self.Text.insertPlainText(file)
                 tme.sleep(0.1)
-        except Exception as err:
-            print("console: ", err)
+        except:
+            return
 
 
 
