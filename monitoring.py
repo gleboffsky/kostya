@@ -6,8 +6,8 @@ import subprocess
 import threading
 import os.path
 import time as tme
-class Example(QWidget):
 
+class Example(QWidget):
     def __init__(self):
         super().__init__()
         self.status = True
@@ -100,28 +100,30 @@ class Example(QWidget):
 
 
     def threading_console(self):
+        if "error" in self.path.decode():
+            QMessageBox.critical(self, "Error ", "Неправильные введенные данные или занят порт", QMessageBox.Ok)
+            self.qbtn.setText("Start")
+            self.qbtn.setStyleSheet("QPushButton { background-color: rgb(0, 255,0) }"
+                              "QPushButton:pressed { background-color: rgb(0, 255,0) }")
         t = threading.Thread(target=self.console)
         t.daemon = True
         t.start()
-        t.join()
-        if not t.is_alive():
-            QMessageBox.critical(self, "Error ", "Неправильный порт или скорость", QMessageBox.Ok)
-
 
     def console(self):
         try:
-            read = open(self.path[0:-2].decode(),"r")
+
             while True:
+                read = open(self.path[0:-2].decode(), "r")
                 file = read.readline()
                 self.Text.insertPlainText(file)
+                read.close()
                 tme.sleep(0.1)
         except:
-            return
+            print("console: wrong path")
 
 
 
     def conductor(self):    # parent readport
-
         global pipe_glob
         if self.qbtn.text() == "Start":
             self.qbtn.setText("Stop")
