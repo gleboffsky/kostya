@@ -111,12 +111,12 @@ class Example(QWidget):
 
     def console(self):
         try:
-
+            read = open(self.path[0:-2].decode(), "r")
             while True:
-                read = open(self.path[0:-2].decode(), "r")
+
                 file = read.readline()
-                self.Text.insertPlainText(file)
-                read.close()
+                if not file =="":
+                    self.Text.append(file)
                 tme.sleep(0.1)
         except:
             print("console: wrong path")
