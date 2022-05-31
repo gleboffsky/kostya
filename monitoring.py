@@ -1,22 +1,19 @@
-from sys import executable,argv,exit
+from sys import argv,exit
 from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QTextEdit, QMessageBox, QLineEdit, QLabel
-from PyQt5 import QtCore
-from PyQt5.QtGui import QCloseEvent, QFont
-import os
-import subprocess
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtGui import QFont
 import threading
-import os.path
 import time as tme
+import tkinter
+from tkinter import filedialog
+import serial
 
 class Example(QWidget):
     def __init__(self):
         super().__init__()
         self.status = True
+        self.status2 = True
         self.initUI()
-
-    def closeEvent(self, a0: QCloseEvent):  # close event
-        pipe_glob.kill()
-        a0.accept()
 
     def initUI(self):  # creating widgets
         self.qbtn = QPushButton('Start', self)  # button Start/Stop
@@ -86,7 +83,9 @@ class Example(QWidget):
         self.label_3.setText("Timeout:")
         self.Text = QTextEdit(self)
         self.Text.setGeometry(75, 250, 430, 275)
-        self.qbtn.clicked.connect(self.conductor)
+        self.Text.moveCursor(QtGui.QTextCursor.End)
+        self.Text.ensureCursorVisible()
+        self.qbtn.clicked.connect(self.path_file)
         self.label_4 = QLabel(self)
         self.label_4.setGeometry(QtCore.QRect(120, 533, 400, 30))
         self.label_4.setObjectName("label_1")
@@ -99,62 +98,88 @@ class Example(QWidget):
         self.label_4.setText("©СПХФУ Лаборатория аддитивных технологий")
         self.path = ""
 
+    def path_file(self):
+        if self.status2 == True:
+            root = tkinter.Tk()
+            root.withdraw()
+            self.path = filedialog.asksaveasfilename(confirmoverwrite=False)
+        self.threading_conductor()
+    def threading_conductor(self):
+        try:
+            t = threading.Thread(target=self.conductor)
+            t.daemon = True
+            t.start()
+
+
+        except Exception as err:
+            print("threading_conductor: ", err)
 
     def threading_console(self):
-        if "error" in self.path.decode():
-            QMessageBox.critical(self, "Error ", "Неправильные введенные данные или занят порт", QMessageBox.Ok)
-            self.qbtn.setText("Start")
-            self.qbtn.setStyleSheet("QPushButton { background-color: rgb(0, 255,0) }"
-                              "QPushButton:pressed { background-color: rgb(0, 255,0) }")
         t = threading.Thread(target=self.console)
         t.daemon = True
         t.start()
 
     def console(self):
         try:
-            read = open(self.path[0:-2].decode(), "r")
-            while True:
+            read = open(self.path, "r")
+            while self.status == True:
 
                 file = read.readline()
                 if not file =="":
                     self.Text.append(file)
-                tme.sleep(0.1)
-        except:
-            print("console: wrong path")
 
-
+        except Exception as err:
+            print("console: wrong path: ", err)
 
     def conductor(self):    # parent readport
-        global pipe_glob
         if self.qbtn.text() == "Start":
+            self.status = True
+            self.status2 = False
             self.qbtn.setText("Stop")
             self.qbtn.setStyleSheet("QPushButton { background-color: red }"
                                     "QPushButton:pressed { background-color: red }")
-            port = self.lineEdit_1.text()
-            connection_speed = self.lineEdit_2.text()
-            timeout = self.lineEdit_3.text()
-            plot = os.path.join(os.path.dirname(__file__), "./other.py")
-            path = [executable, plot]
-            pipe = subprocess.Popen(path, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-            pipe.stdin.write((port+" ").encode("utf8"))
-            pipe.stdin.write((connection_speed+" ").encode("utf8"))
-            pipe.stdin.write((timeout+" ").encode("utf8"))
-            pipe.stdin.write((self.qbtn.text()+" ").encode("utf8"))
-            pipe.stdin.close()
-            self.path = pipe.stdout.readline()
-            pipe_glob = pipe
-            self.threading_console()
+            port, connection_speed, timeout = self.lineEdit_1.text(), self.lineEdit_2.text(), self.lineEdit_3.text()
+            if not "." in self.path:
+                self.path = self.path + ".csv"
 
+                log_file = open(self.path, 'a')
+                log_file.close()
+            else:
+                log_file = open(self.path, 'a')
+                log_file.close()
+            self.threading_console()
+            try:
+                ser = serial.Serial(port=port, baudrate=connection_speed, timeout=int(timeout))
+                while self.status == True:
+                    serialString = ser.readline()
+                    data_str = serialString.decode('UTF-8').replace("\n","")
+                    now = str(round(tme.time(), 2))
+
+                    if data_str != "":
+                        log_file = open(self.path, 'a')
+                        log_file.write(str(now) + ',' + str(data_str))
+                        log_file.close()
+                    tme.sleep(0.1)
+
+            except:
+                self.qbtn.setText("Start")
+                self.qbtn.setStyleSheet("QPushButton { background-color: rgb(0, 255,0) }"
+                                        "QPushButton:pressed { background-color: rgb(0, 255,0) }")
+                QMessageBox.critical(self, "Ошибка подключения ", "Неправильные введенные данные или занят порт", QMessageBox.Ok)
+                self.status = True
 
         elif self.qbtn.text() == "Stop":
-            pipe_glob.kill()
+            self.status2 = True
+            self.status = False
             self.qbtn.setText("Start")
             self.qbtn.setStyleSheet("QPushButton { background-color: rgb(0, 255,0) }"
                               "QPushButton:pressed { background-color: rgb(0, 255,0) }")
 
+
+
 if __name__ == '__main__':
     app = QApplication(argv)
     ex = Example()
-    ex.setWindowTitle("Lebedev")
+    ex.setWindowTitle("Port Monitoring")
     ex.show()
     exit(app.exec_())
