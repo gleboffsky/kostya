@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# PyInstaller build output
+build/
+dist/
+*.exe
+*.toc
+*.pkg
+*.pyz
+
+# IDEs
+.idea/
+.vscode/
+
+# Captured data and logs
+*.csv
+*.log
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Local temporary files
+*.tmp
