@@ -1,0 +1,2 @@
+# PyInstaller build spec is Python code
+*.spec linguist-language=Python
